@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan History - APK Guardian</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-shield-alt"></i>
+                <span>APK Guardian</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/upload">Scan APK</a></li>
+                <li><a href="/history" class="active">History</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="history-page">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="fas fa-history"></i> Scan History</h1>
+                <p>View your previous APK scan results</p>
+            </div>
+
+            <div class="history-container">
+                {% if scans %}
+                <div class="history-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>App Name</th>
+                                <th>Package Name</th>
+                                <th>Verdict</th>
+                                <th>Risk Score</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for scan in scans %}
+                            <tr>
+                                <td>
+                                    <i class="fab fa-android"></i>
+                                    {{ scan.filename }}
+                                </td>
+                                <td>{{ scan.app_name or 'Unknown' }}</td>
+                                <td><code>{{ scan.package_name or 'N/A' }}</code></td>
+                                <td>
+                                    {% if scan.verdict == 'Malicious' %}
+                                    <span class="badge badge-danger">
+                                        <i class="fas fa-exclamation-triangle"></i> Malicious
+                                    </span>
+                                    {% elif scan.verdict == 'Suspicious' %}
+                                    <span class="badge badge-warning">
+                                        <i class="fas fa-exclamation-circle"></i> Suspicious
+                                    </span>
+                                    {% else %}
+                                    <span class="badge badge-success">
+                                        <i class="fas fa-check-circle"></i> Safe
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="risk-score">
+                                        <span class="risk-number 
+                                            {% if scan.risk_score >= 70 %}risk-high
+                                            {% elif scan.risk_score >= 40 %}risk-medium
+                                            {% else %}risk-low{% endif %}">
+                                            {{ scan.risk_score }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>{{ scan.timestamp }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No Scans Yet</h3>
+                    <p>Upload an APK file to see your scan history</p>
+                    <a href="/upload" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Scan Your First APK
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 APK Guardian - CyberSecurity Hackathon Project</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

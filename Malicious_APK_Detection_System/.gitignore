@@ -1,0 +1,69 @@
+# Gitignore for APK Detection System
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+
+# Uploads
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Logs
+server/logs/*
+!server/logs/.gitkeep
+*.log
+
+# Database
+server/database/*.db
+!server/database/.gitkeep
+
+# Models
+server/models/*.pkl
+!server/models/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# APK files
+*.apk

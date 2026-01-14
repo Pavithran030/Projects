@@ -4,6 +4,7 @@ Database Manager for storing scan results
 import sqlite3
 import json
 import logging
+import os
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 
@@ -14,7 +15,18 @@ class DatabaseManager:
     """Manages SQLite database for scan history"""
     
     def __init__(self, db_path='database/scans.db'):
-        self.db_path = db_path
+        # Ensure absolute path
+        if not os.path.isabs(db_path):
+            # Get the directory where this file is located
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            self.db_path = os.path.join(current_dir, db_path)
+        else:
+            self.db_path = db_path
+        
+        # Ensure database directory exists
+        db_dir = os.path.dirname(self.db_path)
+        os.makedirs(db_dir, exist_ok=True)
+        
         self._init_database()
     
     def _init_database(self):

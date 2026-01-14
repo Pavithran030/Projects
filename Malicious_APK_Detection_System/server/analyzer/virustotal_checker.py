@@ -5,7 +5,7 @@ import logging
 import os
 import requests
 import time
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 

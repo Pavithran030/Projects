@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="D:\Projects\CyberSecurity_Hackathon\cyber"
+VIRTUAL_ENV="D:\Projects\Malicious_APK_Detection_System\cyber"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

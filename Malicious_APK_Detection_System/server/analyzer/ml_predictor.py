@@ -13,25 +13,49 @@ logger = logging.getLogger(__name__)
 class MalwarePredictor:
     """ML-based malware detection using trained model"""
     
-    def __init__(self, model_path='models/malware_model.pkl'):
+    def __init__(self, model_path='../model_training/models/malwares_model.pkl'):
         self.model = None
+        self.scaler = None
+        self.metadata = None
         self.model_path = model_path
         self.model_available = False
         self._load_model()
     
     def _load_model(self):
-        """Load trained ML model"""
+        """Load trained ML model, scaler, and metadata"""
         try:
+            # Load main model
             if os.path.exists(self.model_path):
                 with open(self.model_path, 'rb') as f:
                     self.model = pickle.load(f)
+                logger.info(f"✓ ML model loaded from {self.model_path}")
+                
+                # Load scaler
+                scaler_path = self.model_path.replace('.pkl', '_scaler.pkl')
+                if os.path.exists(scaler_path):
+                    with open(scaler_path, 'rb') as f:
+                        self.scaler = pickle.load(f)
+                    logger.info(f"✓ Scaler loaded from {scaler_path}")
+                else:
+                    logger.warning(f"Scaler not found at {scaler_path}")
+                
+                # Load metadata
+                metadata_path = self.model_path.replace('.pkl', '_metadata.pkl')
+                if os.path.exists(metadata_path):
+                    with open(metadata_path, 'rb') as f:
+                        self.metadata = pickle.load(f)
+                    logger.info(f"✓ Metadata loaded: {self.metadata}")
+                else:
+                    logger.warning(f"Metadata not found at {metadata_path}")
+                
                 self.model_available = True
-                logger.info(f"ML model loaded from {self.model_path}")
+                logger.info("ML prediction system ready")
             else:
                 logger.warning(f"ML model not found at {self.model_path}")
                 logger.info("Using rule-based fallback prediction")
         except Exception as e:
             logger.error(f"Failed to load ML model: {str(e)}")
+            self.model_available = False
     
     def predict(self, features: List[float]) -> Dict[str, Any]:
         """
@@ -57,6 +81,11 @@ class MalwarePredictor:
             # Ensure features is numpy array with correct shape
             features_array = np.array(features).reshape(1, -1)
             
+            # Apply feature scaling if scaler is available
+            if self.scaler is not None:
+                features_array = self.scaler.transform(features_array)
+                logger.debug("Features scaled using trained scaler")
+            
             # Get prediction
             prediction = self.model.predict(features_array)[0]
             
@@ -64,6 +93,7 @@ class MalwarePredictor:
             if hasattr(self.model, 'predict_proba'):
                 probabilities = self.model.predict_proba(features_array)[0]
                 confidence = float(max(probabilities))
+                logger.info(f"ML Prediction: {'Malware' if prediction else 'Benign'} (confidence: {confidence:.2%})")
             else:
                 confidence = 0.85 if prediction == 1 else 0.15
             
@@ -74,7 +104,8 @@ class MalwarePredictor:
                 'is_malware': bool(prediction),
                 'confidence': round(confidence, 2),
                 'malware_type': malware_type,
-                'method': 'ml_model'
+                'method': 'ml_model',
+                'model_info': self.metadata if self.metadata else None
             }
         except Exception as e:
             logger.error(f"ML prediction failed: {str(e)}")

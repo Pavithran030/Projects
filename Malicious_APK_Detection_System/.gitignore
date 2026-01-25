@@ -1,0 +1,181 @@
+# ============================================
+# APK Malware Detection System - .gitignore
+# ============================================
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ===== Virtual Environments =====
+cyber/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+pyvenv.cfg
+
+# ===== IDEs & Editors =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ===== Environment Variables =====
+.env
+.env.local
+.env.*.local
+
+# ===== Application Data =====
+# Uploads
+server/uploads/*
+!server/uploads/.gitkeep
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+server/logs/*
+!server/logs/.gitkeep
+logs/*
+!logs/.gitkeep
+*.log
+
+# Database
+server/database/*.db
+server/database/*.db-journal
+server/database/*.db-shm
+server/database/*.db-wal
+!server/database/.gitkeep
+database/*.db
+*.sqlite
+*.sqlite3
+
+# Machine Learning Models (large files)
+server/models/*.pkl
+server/models/*.h5
+server/models/*.pt
+server/models/*.pth
+server/models/*.joblib
+!server/models/.gitkeep
+models/*.pkl
+models/*.h5
+
+# Datasets (can be very large)
+datasets/*
+!datasets/.gitkeep
+!datasets/README.md
+*.csv
+*.arff
+*.data
+
+# ===== OS Specific =====
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ===== Testing & Coverage =====
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+.pytype/
+
+# ===== Jupyter Notebook =====
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+*.ipynb
+
+# ===== APK Files (can be large) =====
+*.apk
+*.xapk
+*.apks
+
+# ===== Documentation Build =====
+docs/_build/
+site/
+
+# ===== Package Files =====
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# ===== Temporary Files =====
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+.cache/
+tmp/
+temp/
+
+# ===== Security & Secrets =====
+*.key
+*.pem
+*.crt
+*.p12
+secrets.json
+credentials.json
+api_keys.txt
+
+# ===== Node.js (if using npm for frontend tools) =====
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# ===== Keep These Files =====
+!.gitkeep
+!.env.example
+!README.md
+!requirements.txt

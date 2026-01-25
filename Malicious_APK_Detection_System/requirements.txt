@@ -20,6 +20,9 @@ joblib==1.3.2
 # API Integration
 requests==2.31.0
 
+# Certificate Analysis
+cryptography==41.0.7
+
 # Database
 # sqlite3 is built into Python
 

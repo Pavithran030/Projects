@@ -230,6 +230,70 @@ function displayResults(result, cached) {
                 </div>
             </div>
         </div>
+    `;
+    
+    // Source Verification Section (NEW)
+    if (result.source_verification) {
+        const sv = result.source_verification;
+        const verifiedColor = sv.verified ? 'var(--success-color)' : 'var(--danger-color)';
+        const verifiedIcon = sv.verified ? 'fa-check-circle' : 'fa-exclamation-triangle';
+        const trustPercentage = Math.round((sv.trust_score || 0) * 100);
+        
+        html += `
+            <div class="result-section">
+                <h3><i class="fas fa-shield-alt"></i> Source Verification</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Source</div>
+                        <div class="info-value">${sv.source || 'Unknown'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Verified</div>
+                        <div class="info-value" style="color: ${verifiedColor}">
+                            <i class="fas ${verifiedIcon}"></i> ${sv.verified ? 'Yes' : 'No'}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Trust Score</div>
+                        <div class="info-value">${trustPercentage}%</div>
+                    </div>
+                </div>
+                
+                ${sv.certificate ? `
+                    <div class="certificate-info" style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 0.5rem;">
+                        <strong style="color: var(--primary-color);">Certificate Details:</strong>
+                        <div class="info-grid" style="margin-top: 0.5rem;">
+                            ${sv.certificate.organization ? `
+                                <div class="info-item">
+                                    <div class="info-label">Organization</div>
+                                    <div class="info-value">${sv.certificate.organization}</div>
+                                </div>
+                            ` : ''}
+                            <div class="info-item">
+                                <div class="info-label">Valid Until</div>
+                                <div class="info-value">${new Date(sv.certificate.valid_until).toLocaleDateString()}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Self-Signed</div>
+                                <div class="info-value">${sv.certificate.is_self_signed ? 'Yes ⚠️' : 'No ✓'}</div>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${sv.warnings && sv.warnings.length > 0 ? `
+                    <div class="warnings" style="margin-top: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--danger-color); border-radius: 0.3rem;">
+                        <strong style="color: var(--danger-color);"><i class="fas fa-exclamation-triangle"></i> Certificate Warnings:</strong>
+                        <ul style="margin: 0.5rem 0 0 1.5rem; color: var(--text-secondary);">
+                            ${sv.warnings.map(w => `<li>${w}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+    
+    html += `
         
         <div class="result-section">
             <h3><i class="fas fa-brain"></i> AI Detection</h3>

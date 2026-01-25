@@ -200,25 +200,36 @@ def scan_apk():
 def calculate_risk_score(analysis_result, ml_result, vt_result):
     """
     Calculate overall risk score (0-100)
+    Enhanced with source verification
     """
     score = 0
     
-    # ML model prediction weight (40%)
+    # ML model prediction weight (35% - reduced from 40%)
     if ml_result.get('is_malware'):
-        score += ml_result.get('confidence', 0) * 40
+        score += ml_result.get('confidence', 0) * 35
     
     # Dangerous permissions weight (20%)
     dangerous_perms = len(analysis_result.get('dangerous_permissions', []))
     score += min(dangerous_perms * 4, 20)
     
-    # Suspicious features weight (20%)
+    # Suspicious features weight (15% - reduced from 20%)
     suspicious_features = len(analysis_result.get('suspicious_features', []))
-    score += min(suspicious_features * 5, 20)
+    score += min(suspicious_features * 5, 15)
     
-    # VirusTotal detections weight (20%)
+    # VirusTotal detections weight (15% - reduced from 20%)
     if vt_result.get('detected'):
         detection_ratio = vt_result.get('positives', 0) / max(vt_result.get('total', 1), 1)
-        score += detection_ratio * 20
+        score += detection_ratio * 15
+    
+    # Source verification weight (15% - NEW)
+    source_info = analysis_result.get('source_verification', {})
+    if not source_info.get('verified', True):  # Default True if not present
+        score += 15  # Add 15 points for unverified source
+    
+    # Additional penalties for certificate warnings
+    warnings = source_info.get('warnings', [])
+    warning_penalty = min(len(warnings) * 3, 10)  # +3 per warning, max 10
+    score += warning_penalty
     
     return min(int(score), 100)
 
@@ -267,6 +278,18 @@ def generate_recommendations(verdict, analysis_result, ml_result):
     
     if 'RECORD_AUDIO' in dangerous_perms:
         recommendations.append('App can record audio - potential eavesdropping risk')
+    
+    # Source verification recommendations
+    source_info = analysis_result.get('source_verification', {})
+    if not source_info.get('verified', True):
+        source = source_info.get('source', 'Unknown')
+        recommendations.append(f'⚠️ APK source: {source} - Not from verified source')
+    
+    warnings = source_info.get('warnings', [])
+    if 'Self-signed certificate' in warnings:
+        recommendations.append('Certificate is self-signed - Cannot verify publisher identity')
+    if 'Certificate expired' in warnings:
+        recommendations.append('⚠️ EXPIRED certificate - This APK may be outdated or tampered')
     
     return recommendations
 

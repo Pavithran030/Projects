@@ -4,6 +4,8 @@ APK Static Analysis Engine using Androguard
 import logging
 from typing import Dict, List, Any
 import re
+import hashlib
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -100,6 +102,9 @@ class APKAnalyzer:
             # Extract URLs
             urls = self._extract_urls(apk)
             
+            # Verify source and certificate
+            source_verification = self.verify_source(apk)
+            
             # Build feature vector for ML
             feature_vector = self._build_feature_vector(
                 permissions, activities, services, receivers, 
@@ -122,6 +127,7 @@ class APKAnalyzer:
                 'providers': providers,
                 'suspicious_features': suspicious_features,
                 'urls': urls[:20],  # Limit URLs
+                'source_verification': source_verification,  # NEW
                 'features': feature_vector,
                 'total_activities': len(activities),
                 'total_services': len(services),
@@ -299,6 +305,188 @@ class APKAnalyzer:
             features.append(1 if has_flag else 0)
         
         return features
+    
+    def verify_source(self, apk) -> Dict[str, Any]:
+        """
+        Enhanced source and certificate verification
+        Analyzes APK signing certificate to determine trustworthiness
+        """
+        try:
+            # Import cryptography library
+            from cryptography import x509
+            from cryptography.hazmat.backends import default_backend
+            
+            # Get certificate from APK
+            cert_der = apk.get_certificate_der()
+            if not cert_der:
+                return {
+                    'source': 'Unknown',
+                    'verified': False,
+                    'trust_score': 0.0,
+                    'error': 'No certificate found in APK'
+                }
+            
+            # Parse certificate
+            cert = x509.load_der_x509_certificate(cert_der, default_backend())
+            
+            # Extract basic information
+            issuer = cert.issuer.rfc4514_string()
+            subject = cert.subject.rfc4514_string()
+            
+            # Validity checks
+            now = datetime.utcnow()
+            is_expired = now > cert.not_valid_after
+            is_not_yet_valid = now < cert.not_valid_before
+            validity_days = (cert.not_valid_after - cert.not_valid_before).days
+            
+            # Self-signed check
+            is_self_signed = issuer == subject
+            
+            # Calculate certificate hash
+            cert_hash = hashlib.sha256(cert_der).hexdigest()
+            
+            # Check against known certificate patterns
+            is_play_store = self._check_play_store_cert(cert_hash, issuer, subject)
+            is_known_publisher = self._check_known_publisher(issuer, subject)
+            
+            # Determine source and trust level
+            warnings = []
+            
+            if is_expired:
+                warnings.append('Certificate expired')
+            if is_not_yet_valid:
+                warnings.append('Certificate not yet valid')
+            if is_self_signed:
+                warnings.append('Self-signed certificate (not from trusted authority)')
+            if validity_days < 365:
+                warnings.append(f'Short validity period ({validity_days} days)')
+            if validity_days > 3650:  # > 10 years
+                warnings.append('Unusually long validity period')
+            
+            # Determine source
+            if is_play_store:
+                source = 'Google Play Store'
+                verified = True
+                trust_score = 1.0
+            elif is_known_publisher:
+                source = 'Known Publisher'
+                verified = True
+                trust_score = 0.85
+            elif not is_self_signed and validity_days >= 365 and not is_expired:
+                source = 'Third-party (Valid Certificate)'
+                verified = True
+                trust_score = 0.7
+            elif not is_self_signed:
+                source = 'Third-party (Certificate Issues)'
+                verified = False
+                trust_score = 0.4
+            else:
+                source = 'Unknown / Untrusted'
+                verified = False
+                trust_score = 0.2
+            
+            # Extract organization info if available
+            org_name = None
+            try:
+                for attr in cert.subject:
+                    if attr.oid._name == 'organizationName':
+                        org_name = attr.value
+                        break
+            except:
+                pass
+            
+            return {
+                'source': source,
+                'verified': verified,
+                'trust_score': trust_score,
+                'certificate': {
+                    'issuer': issuer,
+                    'subject': subject,
+                    'organization': org_name,
+                    'valid_from': cert.not_valid_before.isoformat(),
+                    'valid_until': cert.not_valid_after.isoformat(),
+                    'is_expired': is_expired,
+                    'is_not_yet_valid': is_not_yet_valid,
+                    'is_self_signed': is_self_signed,
+                    'validity_days': validity_days,
+                    'signature_algorithm': cert.signature_algorithm_oid._name,
+                    'serial_number': str(cert.serial_number),
+                    'fingerprint_sha256': cert_hash
+                },
+                'warnings': warnings
+            }
+            
+        except ImportError:
+            logger.warning("cryptography library not installed - source verification disabled")
+            return {
+                'source': 'Unknown (Verification Unavailable)',
+                'verified': False,
+                'trust_score': 0.5,
+                'error': 'Certificate verification library not installed'
+            }
+        except Exception as e:
+            logger.error(f"Source verification failed: {str(e)}")
+            return {
+                'source': 'Unknown',
+                'verified': False,
+                'trust_score': 0.3,
+                'error': str(e)
+            }
+    
+    def _check_play_store_cert(self, cert_hash: str, issuer: str, subject: str) -> bool:
+        """
+        Check if certificate matches known Google Play Store patterns
+        Note: Google Play certificates vary, but have certain patterns
+        """
+        # Google Play Store apps are typically signed by developers
+        # but distributed through Play Store with additional verification
+        # This is a simplified check - in production, maintain a database
+        
+        # Known Google certificate patterns
+        google_patterns = [
+            'CN=Android',
+            'CN=Google Inc',
+            'O=Google Inc',
+            'OU=Android'
+        ]
+        
+        # Check if any Google patterns match
+        cert_string = f"{issuer} {subject}".upper()
+        for pattern in google_patterns:
+            if pattern.upper() in cert_string:
+                return True
+        
+        # You can add specific certificate hashes of known Google certificates here
+        # GOOGLE_PLAY_CERTS = {'hash1', 'hash2', ...}
+        # return cert_hash in GOOGLE_PLAY_CERTS
+        
+        return False
+    
+    def _check_known_publisher(self, issuer: str, subject: str) -> bool:
+        """
+        Check if certificate is from a known reputable publisher
+        """
+        # List of known reputable publishers/organizations
+        known_publishers = [
+            'CN=Facebook',
+            'CN=Twitter',
+            'CN=Microsoft',
+            'CN=Amazon',
+            'CN=WhatsApp',
+            'O=Facebook',
+            'O=Microsoft Corporation',
+            'O=Amazon',
+            'O=Samsung',
+            'O=Xiaomi',
+            'O=Huawei'
+        ]
+        
+        cert_string = f"{issuer} {subject}".upper()
+        for publisher in known_publishers:
+            if publisher.upper() in cert_string:
+                return True
+        
+        return False
     
     def _build_minimal_feature_vector(self, file_list: List[str]) -> List[float]:
         """Build minimal feature vector when Androguard is not available"""

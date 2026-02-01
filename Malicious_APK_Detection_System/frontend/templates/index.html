@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APK Malware Detection System</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-shield-alt"></i>
+                <span>APK Guardian</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/upload">Scan APK</a></li>
+                <li><a href="/history">History</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        <i class="fas fa-shield-virus"></i>
+                        Malicious APK Detection System
+                    </h1>
+                    <p class="hero-subtitle">
+                        Advanced AI-powered analysis to protect you from malicious Android applications
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="/upload" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Scan APK Now
+                        </a>
+                        <a href="#features" class="btn btn-secondary">
+                            <i class="fas fa-info-circle"></i> Learn More
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="shield-animation">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">How It Works</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <h3>1. Upload APK</h3>
+                        <p>Simply upload your Android APK file to our secure platform</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3>2. Deep Analysis</h3>
+                        <p>Our AI engine analyzes permissions, code structure, and behavior patterns</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>3. AI Detection</h3>
+                        <p>Machine learning models trained on thousands of malware samples</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>4. Get Results</h3>
+                        <p>Receive detailed security report with risk assessment and recommendations</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="capabilities">
+            <div class="container">
+                <h2 class="section-title">Detection Capabilities</h2>
+                <div class="capabilities-grid">
+                    <div class="capability-item">
+                        <i class="fas fa-bug"></i>
+                        <div>
+                            <h4>Trojan Detection</h4>
+                            <p>Identifies SMS, banking, and remote access trojans</p>
+                        </div>
+                    </div>
+                    <div class="capability-item">
+                        <i class="fas fa-user-secret"></i>
+                        <div>
+                            <h4>Spyware Analysis</h4>
+                            <p>Detects information stealers and surveillance apps</p>
+                        </div>
+                    </div>
+                    <div class="capability-item">
+                        <i class="fas fa-lock"></i>
+                        <div>
+                            <h4>Ransomware Scanner</h4>
+                            <p>Identifies device-locking and data-encrypting malware</p>
+                        </div>
+                    </div>
+                    <div class="capability-item">
+                        <i class="fas fa-ad"></i>
+                        <div>
+                            <h4>Adware Detection</h4>
+                            <p>Spots aggressive advertising and click fraud apps</p>
+                        </div>
+                    </div>
+                    <div class="capability-item">
+                        <i class="fas fa-key"></i>
+                        <div>
+                            <h4>Permission Analysis</h4>
+                            <p>Reviews dangerous permission combinations</p>
+                        </div>
+                    </div>
+                    <div class="capability-item">
+                        <i class="fas fa-virus"></i>
+                        <div>
+                            <h4>VirusTotal Integration</h4>
+                            <p>Cross-references with 70+ antivirus engines</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="container">
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalScans">0</div>
+                        <div class="stat-label">Total Scans</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="maliciousDetected">0</div>
+                        <div class="stat-label">Threats Detected</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="safeApps">0</div>
+                        <div class="stat-label">Safe Apps</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">99%</div>
+                        <div class="stat-label">Detection Rate</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="container">
+                <h2>Ready to Scan Your APK?</h2>
+                <p>Get instant security analysis with our advanced AI-powered detection system</p>
+                <a href="/upload" class="btn btn-primary btn-large">
+                    <i class="fas fa-shield-alt"></i> Start Scanning
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4><i class="fas fa-shield-alt"></i> APK Guardian</h4>
+                    <p>Protecting users from malicious Android applications with cutting-edge AI technology.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <ul>
+                        <li><a href="/upload">APK Scanner</a></li>
+                        <li><a href="/history">Scan History</a></li>
+                        <li><a href="#">API Access</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 APK Guardian  </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
